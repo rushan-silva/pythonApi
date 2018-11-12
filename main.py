@@ -33,7 +33,7 @@ def make_dict():
 
     dictionary = Counter(words)
     del dictionary[""]
-    return dictionary.most_common(3000)
+    return dictionary.most_common(5000)
 
 
 def make_dataset(dictionary):

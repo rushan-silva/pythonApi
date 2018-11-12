@@ -1,6 +1,7 @@
 import cPickle as c
 import os
 from collections import Counter
+import json
 import unicodedata
 
 def detector(commentArray):
@@ -33,15 +34,16 @@ def detector(commentArray):
 
         dictionary = Counter(words)
         del dictionary[""]
-        return dictionary.most_common(3000)
+        return dictionary.most_common(5000)
 
 
-    clf = load("text-classifier.mdl")
+    clf = load("Detect/text-classifier.mdl")
     d = make_dict()
 
     for ind, commentObj in enumerate(commentArray):
+        print commentObj
         features = []
-        comment = commentObj['message']
+        comment = commentObj['comment']
         print comment
         # comment = unicodedata.normalize('NFKD', comment).encode('ascii', 'ignore')
         inp = comment.split()
@@ -52,6 +54,10 @@ def detector(commentArray):
         print ["Not Spam", "Spam!"][res[0]]
         if (res[0] == 1):
             del commentArray[ind]
+
+    # data = {}
+    # data['data'] = commentArray
+    # json_data = json.dumps(data)
 
     print commentArray
     return commentArray

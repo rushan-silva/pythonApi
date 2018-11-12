@@ -11,10 +11,10 @@ from sklearn.metrics import accuracy_score
 # TODO: Import 'GridSearchCV', 'make_scorer', and any other necessary libraries
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import make_scorer
+import cPickle as c
 
-
-# TODO: Load the dataset
-data = pd.read_csv("D:/comments.csv")
+# Load the dataset
+data = pd.read_csv("comments.csv")
 
 #Defining the splits for categories. 10-25 will be poor quality, 25-50 will be average, 50-100 will be great
 bins = [10,25,50,100]
@@ -100,7 +100,7 @@ def train_predict_evaluate(learner, sample_size, X_train, y_train, X_test, y_tes
 
 
 
-# TODO: Initialize the classifier
+# Initialize the classifier
 clf = RandomForestClassifier(max_depth=None, random_state=None)
 
 # Create the parameters or base_estimators list you wish to tune, using a dictionary if needed.
@@ -114,19 +114,24 @@ max_depth: The maximum depth of the tree
 parameters = {'n_estimators': [10, 20, 30], 'max_features':[1,2,3, None], 'max_depth': [5,6,7, None]}
 
 
-# TODO: Make an fbeta_score scoring object using make_scorer()
+# Make an fbeta_score scoring object using make_scorer()
 scorer = make_scorer(fbeta_score, beta=0.5, average="micro")
 
-# TODO: Perform grid search on the claszsifier using 'scorer' as the scoring method using GridSearchCV()
+# Perform grid search on the claszsifier using 'scorer' as the scoring method using GridSearchCV()
 grid_obj = GridSearchCV(clf, parameters, scoring=scorer)
 #print(grid_obj)
 
-# TODO: Fit the grid search object to the training data and find the optimal parameters using fit()
+# Fit the grid search object to the training data and find the optimal parameters using fit()
 grid_fit = grid_obj.fit(X_train, y_train)
+
+def save(clf, name):
+    with open(name, 'wb') as fp:
+        c.dump(clf, fp)
+    print "saved"
 
 # Get the estimator
 best_clf = grid_fit.best_estimator_
-
+save(best_clf, "success-classifier-emotions.mdl")
 
 # Make predictions using the unoptimized and model
 predictions = (clf.fit(X_train, y_train)).predict(X_test)
@@ -141,7 +146,7 @@ print(best_clf)
 print("\nFinal accuracy score on the testing data: {:.8f}".format(accuracy_score(y_test, best_predictions)))
 print("Final F-score on the testing data: {:.8f}".format(fbeta_score(y_test, best_predictions, beta = 0.5,  average="micro")))
 
-fbdata = [[7,5,2,20,2,4,8]]
-#fbdata.reshape(-1,1)
-quality= best_clf.predict(fbdata)
-print("Predicted Quality for the post is: ", quality[0])
+# fbdata = [[7,5,2,20,2,4,8]]
+# #fbdata.reshape(-1,1)
+# quality= best_clf.predict(fbdata)
+# print("Predicted Quality for the post is: ", quality[0])
